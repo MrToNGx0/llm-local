@@ -103,6 +103,17 @@ def chat(prompt: str):
                 "error": str(e)
             }
 
+@app.get("/api/tags")
+def ollama_tags():
+    try:
+        response = requests.get(f"{OLLAMA_URL}/api/tags")
+        return response.json()
+    except Exception as e:
+        return {
+            "models": [],
+            "error": str(e)
+        }
+
 @app.post("/api/generate")
 async def generate(request: Request):
     body = await request.json()
