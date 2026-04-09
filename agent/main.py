@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 import os
 import requests
 import uvicorn
@@ -40,14 +40,31 @@ def call_gemini(prompt: str):
     return data["candidates"][0]["content"]["parts"][0]["text"]
 
 # ---------------------------
-# Smart Router
+# 🔥 Llama Router (ตัวหลัก)
 # ---------------------------
-def choose_model(prompt: str):
-    if len(prompt) > 1500:
-        return "gemini"
-    if "analyze" in prompt or "reason" in prompt:
-        return "gemini"
-    return "ollama"
+def llama_router(prompt: str):
+    router_prompt = f"""
+You are a smart AI router.
+
+Rules:
+- If the task is simple, answer directly.
+- If the task is complex, reasoning-heavy, or long → reply ONLY: USE_GEMINI
+
+Prompt:
+{prompt}
+"""
+
+    result = call_ollama(router_prompt)
+
+    # ถ้า Llama บอกให้ใช้ Gemini
+    if "USE_GEMINI" in result:
+        return "gemini", call_gemini(prompt)
+
+    # กันเคสตอบมั่ว/สั้นเกิน
+    if len(result.strip()) < 30:
+        return "gemini", call_gemini(prompt)
+
+    return "ollama", result
 
 # ---------------------------
 # Routes
@@ -66,23 +83,43 @@ def health_check():
 
 @app.post("/chat")
 def chat(prompt: str):
-    model_choice = choose_model(prompt)
-
     try:
-        if model_choice == "gemini":
-            answer = call_gemini(prompt)
-        else:
-            answer = call_ollama(prompt)
+        model_used, answer = llama_router(prompt)
 
         return {
-            "model_used": model_choice,
+            "model_used": model_used,
             "response": answer
         }
 
     except Exception as e:
+        # fallback
+        try:
+            return {
+                "model_used": "gemini_fallback",
+                "response": call_gemini(prompt)
+            }
+        except:
+            return {
+                "error": str(e)
+            }
+
+@app.post("/api/generate")
+async def generate(request: Request):
+    body = await request.json()
+    prompt = body.get("prompt", "")
+
+    try:
+        model_used, answer = llama_router(prompt)
+
         return {
-            "error": str(e),
-            "fallback": "ollama"
+            "response": f"[{model_used.upper()}]\n\n{answer}",
+            "done": True
+        }
+
+    except Exception as e:
+        return {
+            "response": f"Error: {str(e)}",
+            "done": True
         }
 
 # ---------------------------
