@@ -107,7 +107,24 @@ def chat(prompt: str):
 def ollama_tags():
     try:
         response = requests.get(f"{OLLAMA_URL}/api/tags")
-        return response.json()
+        data = response.json()
+
+        models = []
+        for m in data.get("models", []):
+            models.append({
+                "name": m.get("name"),
+                "model": m.get("name"),
+                "modified_at": m.get("modified_at", ""),
+                "size": m.get("size", 0),
+                "digest": m.get("digest", ""),
+                "details": m.get("details", {}),
+                "version": "0.1.0"
+            })
+
+        return {
+            "models": models
+        }
+
     except Exception as e:
         return {
             "models": [],
