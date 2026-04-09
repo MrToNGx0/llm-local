@@ -1,0 +1,98 @@
+services:
+  # --- AI Engine ---
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    ports:
+      - "${OLLAMA_PORT:-11434}:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ai-network
+
+  # --- Auto Model Puller (Runs once and exits) ---
+  ollama-puller:
+    image: curlimages/curl:latest
+    container_name: ollama-puller
+    depends_on:
+      ollama:
+        condition: service_healthy
+    command: >
+      http://ollama:11434/api/pull -d '{"name": "${MODEL:-llama3.1:8b-instruct-q4_K_M}"}'
+    networks:
+      - ai-network
+
+  # --- Web Interface ---
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    restart: unless-stopped
+    ports:
+      - "${WEBUI_PORT:-3000}:8080"
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - WEBUI_SECRET_KEY=${WEBUI_SECRET_KEY:-changeme}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY:-}
+      - DEFAULT_MODELS=${DEFAULT_MODELS:-}
+      - ENABLE_SIGNUP=${ENABLE_SIGNUP:-true}
+    volumes:
+      - open-webui_data:/app/backend/data
+    depends_on:
+      ollama:
+        condition: service_healthy
+    networks:
+      - ai-network
+
+  # --- Custom Agent (FastAPI) ---
+  agent:
+    build:
+      context: ./agent
+    container_name: agent
+    restart: unless-stopped
+    ports:
+      - "${AGENT_PORT:-8000}:8000"
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY:-}
+      - OLLAMA_URL=http://ollama:11434
+      - MODEL=${MODEL:-llama3.1:8b-instruct-q4_K_M}
+    volumes:
+      - ./agent:/app
+      - ./workspace:/workspace
+    depends_on:
+      ollama:
+        condition: service_healthy
+    networks:
+      - ai-network
+
+  # --- Monitoring (Real-time Logs) ---
+  dozzle:
+    image: amir20/dozzle:latest
+    container_name: dozzle
+    ports:
+      - "${DOZZLE_PORT:-8888}:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+    networks:
+      - ai-network
+
+volumes:
+  ollama_data:
+  open-webui_data:
+
+networks:
+  ai-network:
+    driver: bridge

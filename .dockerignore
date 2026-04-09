@@ -1,0 +1,7 @@
+.git
+.env
+ollama_data
+open-webui_data
+node_modules
+*.log
+.DS_Store
