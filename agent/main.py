@@ -81,27 +81,39 @@ def read_root():
 def health_check():
     return {"status": "healthy"}
 
-@app.post("/chat")
-def chat(prompt: str):
+@app.post("/api/chat")
+async def chat_api(request: Request):
+    body = await request.json()
+
+    messages = body.get("messages", [])
+
+    prompt = ""
+    for msg in messages:
+        role = msg.get("role", "")
+        content = msg.get("content", "")
+        prompt += f"{role}: {content}\n"
+
     try:
         model_used, answer = llama_router(prompt)
 
         return {
-            "model_used": model_used,
-            "response": answer
+            "model": MODEL,
+            "created_at": "2024-01-01T00:00:00Z",
+            "message": {
+                "role": "assistant",
+                "content": f"[{model_used.upper()}]\n\n{answer}"
+            },
+            "done": True
         }
 
     except Exception as e:
-        # fallback
-        try:
-            return {
-                "model_used": "gemini_fallback",
-                "response": call_gemini(prompt)
-            }
-        except:
-            return {
-                "error": str(e)
-            }
+        return {
+            "message": {
+                "role": "assistant",
+                "content": f"Error: {str(e)}"
+            },
+            "done": True
+        }
 
 @app.get("/api/tags")
 def ollama_tags():
