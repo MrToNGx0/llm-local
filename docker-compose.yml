@@ -47,6 +47,7 @@ services:
             - MODEL_NAME=${MODEL}
         volumes:
             - ./openclaw.json:/tmp/openclaw.json
+            - ./agent.md:/root/.config/openclaw/agents/default/agent.md
             - ./workspace:/root/.openclaw/workspace
         command: >
             sh -c "
