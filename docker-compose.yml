@@ -38,7 +38,12 @@ services:
         restart: unless-stopped
 
         command: >
-            sh -c "openclaw gateway --mode local --allow-unconfigured"
+            sh -c "
+            chown -R node:node /home/node/.openclaw &&
+            openclaw gateway --allow-unconfigured --no-auth
+            "
+
+        user: '0'
 
         ports:
             - '${OPENCLAW_PORT:-18789}:18789'
@@ -46,7 +51,7 @@ services:
         environment:
             - OLLAMA_BASE_URL=http://ollama:11434
             - ENABLE_AUTH=${ENABLE_AUTH:-false}
-            - ADMIN_PASSWORD=${ADMIN_PASSWORD:-}
+            - GATEWAY_TOKEN=${GATEWAY_TOKEN:-123456789}
 
         volumes:
             - openclaw_data:/app/data
