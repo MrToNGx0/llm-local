@@ -1,7 +1,9 @@
 .git
+.gitignore
 .env
-ollama_data
-open-webui_data
+README.md
+docker-compose.yml
+agent/
 node_modules
-*.log
+npm-debug.log
 .DS_Store

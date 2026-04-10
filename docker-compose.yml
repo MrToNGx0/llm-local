@@ -17,13 +17,14 @@ services:
               capabilities: [gpu]
     healthcheck:
       test: ["CMD", "ollama", "list"]
-      interval: 10s
+      interval: 15s
       timeout: 5s
       retries: 5
+      start_period: 20s
     networks:
       - ai-network
 
-  # --- Auto Model Puller (Runs once and exits) ---
+  # --- Auto Model Puller ---
   ollama-puller:
     image: curlimages/curl:latest
     container_name: ollama-puller
@@ -31,46 +32,27 @@ services:
       ollama:
         condition: service_healthy
     command: >
-      http://ollama:11434/api/pull -d '{"name": "${MODEL:-llama3.1:8b-instruct-q4_K_M}"}'
+      http://ollama:11434/api/pull -d '{"name": "${MODEL:-llama3.1:8b-instruct-q5_K_M}"}'
     networks:
       - ai-network
     restart: "no"
 
-  # --- Web Interface ---
-  open-webui:
-    image: ghcr.io/open-webui/open-webui:main
-    container_name: open-webui
+  # --- Web Interface (Open Claw) ---
+  openclaw:
+    image: ghcr.io/openclaw/openclaw:latest
+    container_name: openclaw
     restart: unless-stopped
     ports:
-      - "${WEBUI_PORT:-3000}:8080"
-    environment:
-      - OLLAMA_BASE_URL=http://agent:8000
-      - WEBUI_SECRET_KEY=${WEBUI_SECRET_KEY:-changeme}
-      - GOOGLE_API_KEY=${GOOGLE_API_KEY:-}
-      - DEFAULT_MODELS=${DEFAULT_MODELS:-}
-      - ENABLE_SIGNUP=${ENABLE_SIGNUP:-true}
-    volumes:
-      - open-webui_data:/app/backend/data
-    depends_on:
-      agent:
-        condition: service_started
-    networks:
-      - ai-network
-
-  # --- Custom Agent (FastAPI) ---
-  agent:
-    build:
-      context: ./agent
-    container_name: agent
-    restart: unless-stopped
-    ports:
-      - "${AGENT_PORT:-8000}:8000"
+      - "${OPENCLAW_PORT:-8080}:8080"
     environment:
       - GOOGLE_API_KEY=${GOOGLE_API_KEY:-}
-      - OLLAMA_URL=http://ollama:11434
-      - MODEL=${MODEL:-llama3.1:8b-instruct-q4_K_M}
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - ENABLE_AUTH=${ENABLE_AUTH:-false}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-}
     volumes:
-      - ./agent:/app
+      - openclaw_data:/app/data
       - ./workspace:/workspace
     depends_on:
       ollama:
@@ -78,7 +60,7 @@ services:
     networks:
       - ai-network
 
-  # --- Monitoring (Real-time Logs) ---
+  # --- Monitoring ---
   dozzle:
     image: amir20/dozzle:latest
     container_name: dozzle
@@ -92,7 +74,7 @@ services:
 
 volumes:
   ollama_data:
-  open-webui_data:
+  openclaw_data:
 
 networks:
   ai-network:
