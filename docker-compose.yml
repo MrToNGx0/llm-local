@@ -36,21 +36,30 @@ services:
         image: ghcr.io/openclaw/openclaw:latest
         container_name: openclaw
         restart: unless-stopped
+
+        command: >
+            sh -c "openclaw onboard --mode local || true && openclaw gateway"
+
         ports:
             - '${OPENCLAW_PORT:-18789}:18789'
+
         environment:
             - GOOGLE_API_KEY=${GOOGLE_API_KEY:-}
-            - OLLAMA_BASE_URL=http://ollama:11434
+            - OLLAMA_BASE_URL=http://host.docker.internal:11434
             - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
             - OPENAI_API_KEY=${OPENAI_API_KEY:-}
             - ENABLE_AUTH=${ENABLE_AUTH:-false}
             - ADMIN_PASSWORD=${ADMIN_PASSWORD:-}
+
         volumes:
             - openclaw_data:/app/data
+            - openclaw_config:/home/node/.openclaw
             - ./workspace:/workspace
+
         depends_on:
             ollama:
                 condition: service_healthy
+
         networks:
             - ai-network
 
