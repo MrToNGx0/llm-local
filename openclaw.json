@@ -1,0 +1,40 @@
+{
+    "gateway": {
+        "auth": {
+            "mode": "token",
+            "token": "REPLACE_GATEWAY_TOKEN"
+        },
+        "controlUi": {
+            "allowedOrigins": ["http://localhost:8080", "http://127.0.0.1:8080"],
+            "allowInsecureAuth": true
+        },
+        "mode": "local",
+        "port": 18789,
+        "bind": "auto"
+    },
+    "agents": {
+        "defaults": {
+            "workspace": "/root/.openclaw/workspace",
+            "model": {
+                "primary": "ollama/REPLACE_MODEL"
+            }
+        }
+    },
+    "models": {
+        "providers": {
+            "ollama": {
+                "baseUrl": "http://ollama:11434",
+                "api": "ollama"
+            },
+            "google": {
+                "apiKey": "REPLACE_GOOGLE_KEY"
+            }
+        }
+    },
+    "channels": {
+        "telegram": {
+            "enabled": true,
+            "botToken": "REPLACE_TELEGRAM_TOKEN"
+        }
+    }
+}
