@@ -35,9 +35,11 @@ services:
         restart: unless-stopped
 
         command: >
-            sh -c "[ ! -f /home/node/.openclaw/config.json ] &&
-            openclaw onboard --mode local ;
-            openclaw gateway"
+            sh -c "
+            [ ! -f /home/node/.openclaw/config.json ] &&
+            openclaw setup --mode local ;
+            openclaw gateway
+            "
 
         ports:
             - '${OPENCLAW_PORT:-18789}:18789'
