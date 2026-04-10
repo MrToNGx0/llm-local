@@ -48,6 +48,7 @@ services:
             - ./openclaw.json:/tmp/openclaw.json
             - ./agent.md:/root/.config/openclaw/agents/default/agent.md
             - ./workspace:/root/.openclaw/workspace
+            - ./workspace/.openclaw_app_data:/root/.local/share/openclaw
         command: >
             sh -c "
             mkdir -p /root/.openclaw &&
