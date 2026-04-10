@@ -15,19 +15,20 @@
     "agents": {
         "defaults": {
             "workspace": "/root/.openclaw/workspace",
-            "model": {
-                "primary": "ollama/REPLACE_MODEL"
-            }
+            "model": { "primary": "ollama/REPLACE_MODEL" }
         }
     },
     "models": {
         "providers": {
             "ollama": {
                 "baseUrl": "http://ollama:11434",
-                "api": "ollama"
+                "api": "ollama",
+                "models": []
             },
             "google": {
-                "apiKey": "REPLACE_GOOGLE_KEY"
+                "baseUrl": "https://generativelanguage.googleapis.com",
+                "apiKey": "REPLACE_GOOGLE_KEY",
+                "models": []
             }
         }
     },
