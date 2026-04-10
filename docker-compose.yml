@@ -32,6 +32,7 @@ services:
         restart: 'no'
 
     # --- Web Interface (OpenClaw) ---
+    # --- Web Interface (OpenClaw) ---
     openclaw:
         image: ghcr.io/openclaw/openclaw:latest
         container_name: openclaw
@@ -47,13 +48,14 @@ services:
         volumes:
             - ./openclaw.json:/tmp/openclaw.json
             - ./workspace:/root/.openclaw/workspace
-
         command: >
             sh -c "
             mkdir -p /root/.openclaw &&
             cp /tmp/openclaw.json /root/.openclaw/openclaw.json && 
             sed -i \"s/REPLACE_GATEWAY_TOKEN/$$GATEWAY_TOKEN/g\" /root/.openclaw/openclaw.json &&
             sed -i \"s|REPLACE_TELEGRAM_TOKEN|$$TELEGRAM_TOKEN|g\" /root/.openclaw/openclaw.json &&
+            sed -i \"s/REPLACE_GOOGLE_KEY/$$GOOGLE_KEY/g\" /root/.openclaw/openclaw.json &&
+            sed -i \"s/REPLACE_MODEL/$$MODEL_NAME/g\" /root/.openclaw/openclaw.json &&
             openclaw gateway --allow-unconfigured
             "
         depends_on:
