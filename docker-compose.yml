@@ -40,7 +40,7 @@ services:
         command: >
             sh -c "
             chown -R node:node /home/node/.openclaw &&
-            openclaw gateway --allow-unconfigured --no-auth
+            openclaw gateway --allow-unconfigured
             "
 
         user: '0'
