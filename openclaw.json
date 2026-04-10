@@ -15,8 +15,7 @@
     "agents": {
         "defaults": {
             "workspace": "/root/.openclaw/workspace",
-            "model": { "primary": "ollama/REPLACE_MODEL" },
-            "tools": [{ "name": "duckduckgo_search" }, { "name": "web_fetch" }]
+            "model": { "primary": "ollama/REPLACE_MODEL" }
         }
     },
     "models": {
