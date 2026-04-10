@@ -1,81 +1,75 @@
 services:
-  # --- AI Engine ---
-  ollama:
-    image: ollama/ollama:latest
-    container_name: ollama
-    restart: unless-stopped
-    ports:
-      - "${OLLAMA_PORT:-11434}:11434"
-    volumes:
-      - ollama_data:/root/.ollama
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
-    healthcheck:
-      test: ["CMD", "ollama", "list"]
-      interval: 15s
-      timeout: 5s
-      retries: 5
-      start_period: 20s
-    networks:
-      - ai-network
+    # --- AI Engine ---
+    ollama:
+        image: ollama/ollama:latest
+        container_name: ollama
+        restart: unless-stopped
+        ports:
+            - '${OLLAMA_PORT:-11434}:11434'
+        volumes:
+            - ollama_data:/root/.ollama
+        gpus: all
+        healthcheck:
+            test: ['CMD', 'ollama', 'list']
+            interval: 15s
+            timeout: 5s
+            retries: 5
+            start_period: 20s
+        networks:
+            - ai-network
 
-  # --- Auto Model Puller ---
-  ollama-puller:
-    image: curlimages/curl:latest
-    container_name: ollama-puller
-    depends_on:
-      ollama:
-        condition: service_healthy
-    command: >
-      http://ollama:11434/api/pull -d '{"name": "${MODEL:-llama3.1:8b-instruct-q5_K_M}"}'
-    networks:
-      - ai-network
-    restart: "no"
+    # --- Auto Model Puller ---
+    ollama-puller:
+        image: curlimages/curl:latest
+        container_name: ollama-puller
+        depends_on:
+            ollama:
+                condition: service_healthy
+        command: >
+            http://ollama:11434/api/pull -d '{"name": "${MODEL:-llama3.1:8b-instruct-q5_K_M}"}'
+        networks:
+            - ai-network
+        restart: 'no'
 
-  # --- Web Interface (Open Claw) ---
-  openclaw:
-    image: ghcr.io/openclaw/openclaw:latest
-    container_name: openclaw
-    restart: unless-stopped
-    ports:
-      - "${OPENCLAW_PORT:-8080}:8080"
-    environment:
-      - GOOGLE_API_KEY=${GOOGLE_API_KEY:-}
-      - OLLAMA_BASE_URL=http://ollama:11434
-      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
-      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
-      - ENABLE_AUTH=${ENABLE_AUTH:-false}
-      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-}
-    volumes:
-      - openclaw_data:/app/data
-      - ./workspace:/workspace
-    depends_on:
-      ollama:
-        condition: service_healthy
-    networks:
-      - ai-network
+    # --- Web Interface (Open Claw) ---
+    openclaw:
+        image: ghcr.io/openclaw/openclaw:latest
+        container_name: openclaw
+        restart: unless-stopped
+        ports:
+            - '${OPENCLAW_PORT:-18789}:18789'
+        environment:
+            - GOOGLE_API_KEY=${GOOGLE_API_KEY:-}
+            - OLLAMA_BASE_URL=http://ollama:11434
+            - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+            - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+            - ENABLE_AUTH=${ENABLE_AUTH:-false}
+            - ADMIN_PASSWORD=${ADMIN_PASSWORD:-}
+        volumes:
+            - openclaw_data:/app/data
+            - ./workspace:/workspace
+        depends_on:
+            ollama:
+                condition: service_healthy
+        networks:
+            - ai-network
 
-  # --- Monitoring ---
-  dozzle:
-    image: amir20/dozzle:latest
-    container_name: dozzle
-    ports:
-      - "${DOZZLE_PORT:-8888}:8080"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    restart: unless-stopped
-    networks:
-      - ai-network
+    # --- Monitoring ---
+    dozzle:
+        image: amir20/dozzle:latest
+        container_name: dozzle
+        ports:
+            - '${DOZZLE_PORT:-8888}:8080'
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+        restart: unless-stopped
+        networks:
+            - ai-network
 
 volumes:
-  ollama_data:
-  openclaw_data:
+    ollama_data:
+    openclaw_data:
 
 networks:
-  ai-network:
-    driver: bridge
+    ai-network:
+        driver: bridge
