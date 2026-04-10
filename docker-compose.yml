@@ -36,35 +36,26 @@ services:
         image: ghcr.io/openclaw/openclaw:latest
         container_name: openclaw
         restart: unless-stopped
-
         command: >
             sh -c "
-            chown -R node:node /home/node/.openclaw &&
+            mkdir -p /root/.openclaw &&
             openclaw gateway --allow-unconfigured
             "
-
         user: '0'
-
         ports:
             - '${OPENCLAW_PORT:-18789}:18789'
-
         environment:
             - OLLAMA_BASE_URL=http://ollama:11434
             - ENABLE_AUTH=${ENABLE_AUTH:-false}
-            - GATEWAY_TOKEN=${GATEWAY_TOKEN:-123456789}
-
+            - GATEWAY_AUTH_TOKEN=${GATEWAY_TOKEN:-123456789}
+            - GATEWAY_CONTROLUI_ALLOWEDORIGINS=http://localhost:18789,http://127.0.0.1:18789
         volumes:
             - openclaw_data:/app/data
-            - openclaw_config:/home/node/.openclaw
-            - ./workspace:/workspace
-
+            - openclaw_config:/root/.openclaw
+            - ./workspace:/root/.openclaw/workspace
         depends_on:
             ollama:
                 condition: service_healthy
-
-        extra_hosts:
-            - 'host.docker.internal:host-gateway'
-
         networks:
             - ai-network
 
