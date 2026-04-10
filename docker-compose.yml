@@ -1,5 +1,4 @@
 services:
-    # --- AI Engine ---
     ollama:
         image: ollama/ollama:latest
         container_name: ollama
@@ -18,7 +17,6 @@ services:
         networks:
             - ai-network
 
-    # --- Auto Model Puller ---
     ollama-puller:
         image: curlimages/curl:latest
         container_name: ollama-puller
@@ -26,28 +24,26 @@ services:
             ollama:
                 condition: service_healthy
         command: >
-            http://ollama:11434/api/pull -d '{"name": "${MODEL:-llama3.1:8b-instruct-q5_K_M}"}'
+            curl http://ollama:11434/api/pull -d '{"name": "${MODEL:-qwen2.5:7b-instruct}"}'
         networks:
             - ai-network
         restart: 'no'
 
-    # --- Web Interface (Open Claw) ---
     openclaw:
         image: ghcr.io/openclaw/openclaw:latest
         container_name: openclaw
         restart: unless-stopped
 
         command: >
-            sh -c "openclaw onboard --mode local || true && openclaw gateway"
+            sh -c "[ ! -f /home/node/.openclaw/config.json ] &&
+            openclaw onboard --mode local ;
+            openclaw gateway"
 
         ports:
             - '${OPENCLAW_PORT:-18789}:18789'
 
         environment:
-            - GOOGLE_API_KEY=${GOOGLE_API_KEY:-}
             - OLLAMA_BASE_URL=http://host.docker.internal:11434
-            - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
-            - OPENAI_API_KEY=${OPENAI_API_KEY:-}
             - ENABLE_AUTH=${ENABLE_AUTH:-false}
             - ADMIN_PASSWORD=${ADMIN_PASSWORD:-}
 
@@ -63,7 +59,6 @@ services:
         networks:
             - ai-network
 
-    # --- Monitoring ---
     dozzle:
         image: amir20/dozzle:latest
         container_name: dozzle
@@ -78,6 +73,7 @@ services:
 volumes:
     ollama_data:
     openclaw_data:
+    openclaw_config:
 
 networks:
     ai-network:
