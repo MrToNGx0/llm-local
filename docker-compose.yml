@@ -32,7 +32,6 @@ services:
         restart: 'no'
 
     # --- Web Interface (OpenClaw) ---
-    # --- Web Interface (OpenClaw) ---
     openclaw:
         image: ghcr.io/openclaw/openclaw:latest
         container_name: openclaw
@@ -49,8 +48,11 @@ services:
             - ./openclaw.json:/tmp/openclaw.json
             - ./agent.md:/root/.config/openclaw/agents/default/agent.md
             - ./workspace:/root/.openclaw/workspace
+            # เก็บข้อมูล Pairing และ Database ถาวร ไม่ต้องขอรหัสใหม่ทุกครั้ง
+            - ./openclaw_data:/root/.local/share/openclaw
         command: >
             sh -c "
+            pip install duckduckgo-search &&
             mkdir -p /root/.openclaw &&
             cp /tmp/openclaw.json /root/.openclaw/openclaw.json && 
             sed -i \"s/REPLACE_GATEWAY_TOKEN/$$GATEWAY_TOKEN/g\" /root/.openclaw/openclaw.json &&
