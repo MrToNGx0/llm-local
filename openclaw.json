@@ -15,6 +15,7 @@
     "agents": {
         "defaults": {
             "workspace": "/root/.openclaw/workspace",
+            "systemPrompt": "You are a crypto expert. ALWAYS respond in THAI. You must not use Chinese. If you cannot access real-time data, say so in Thai. Keep your analysis concise.",
             "model": { "primary": "ollama/REPLACE_MODEL" }
         }
     },
