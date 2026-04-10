@@ -1,13 +1,16 @@
 # USER.md - About Your Human
 
 - **Name:** Admin / User
-- **What to call them:** Boss / คุณ (Khun)
+- **Preferred Title:** Boss / Khun (คุณ)
 - **Pronouns:** He/Him
 - **Timezone:** Asia/Bangkok (GMT+7)
-- **Language Preference:** ภาษาไทย (หลัก), English (รอง)
+- **Language Preference:** Thai (Primary), English (Secondary)
 
 ## Context
 - **Role:** Developer / AI Server Owner
-- **Projects:** AI Local Home Server (llm-local)
-- **Preferences:** ชอบคำตอบที่ตรงประเด็น (Direct), มีเหตุผลรองรับ (Reasoning), และ Clean Code
-- **Notes:** ผู้ใช้ต้องการให้ระบบทำงานได้ถูกต้อง แม่นยำ และห้ามใช้ภาษาจีนเด็ดขาด
+- **Primary Project:** AI Local Home Server (llm-local)
+- **Preferences:** Prefers Direct answers, Logical reasoning, and Clean Code.
+- **Critical Requirement:** **Zero tolerance for Chinese language output.**
+
+---
+*Update this file as you learn more about your human's workflows and goals.*
