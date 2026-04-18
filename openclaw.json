@@ -16,8 +16,8 @@
         "defaults": {
             "workspace": "/root/.openclaw/workspace",
             "model": {
-                "primary": "google/gemini-1.5-flash",
-                "secondary": "ollama/llama3.1:8b-instruct-q4_K_M"
+                "primary": { "id": "google/gemini-3-flash-preview" },
+                "secondary": { "id": "ollama/llama3.1:8b-instruct-q4_K_M" }
             }
         }
     },
@@ -26,12 +26,18 @@
             "ollama": {
                 "baseUrl": "http://ollama:11434",
                 "api": "ollama",
-                "models": []
+                "models": [
+                    { "id": "llama3.1:8b-instruct-q4_K_M" }
+                ]
             },
             "google": {
                 "baseUrl": "https://generativelanguage.googleapis.com",
                 "apiKey": "__GOOGLE_API_KEY__",
-                "models": []
+                "models": [
+                    { "id": "gemini-3-flash-preview" },
+                    { "id": "gemini-1.5-pro" },
+                    { "id": "gemini-1.5-flash" }
+                ]
             }
         }
     },
