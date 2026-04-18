@@ -10,7 +10,7 @@
 - **Role:** Developer / AI Server Owner
 - **Primary Project:** AI Local Home Server (llm-local)
 - **Preferences:** Prefers Direct answers, Logical reasoning, and Clean Code.
-- **Critical Requirement:** **Zero tolerance for Chinese language output.**
+- **Language Requirement:** All communication must be in Thai or English.
 
 ---
 *Update this file as you learn more about your human's workflows and goals.*

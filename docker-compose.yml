@@ -25,8 +25,9 @@ services:
         depends_on:
             ollama:
                 condition: service_healthy
+        # ปรับให้ดึง Llama 3.1 8B Q4_K_M ตามที่ตกลงกันไว้
         command: >
-            sh -c "curl http://ollama:11434/api/pull -d '{\"name\": \"${MODEL:-qwen2.5:7b-instruct}\"}'"
+            sh -c "curl http://ollama:11434/api/pull -d '{\"name\": \"${MODEL:-llama3.1:8b-instruct-q4_K_M}\"}'"
         networks:
             - ai-network
         restart: 'no'
@@ -42,8 +43,8 @@ services:
         environment:
             - GATEWAY_TOKEN=${GATEWAY_TOKEN}
             - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
-            - GOOGLE_KEY=${GOOGLE_API_KEY}
-            - MODEL_NAME=${MODEL}
+            - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+            - MODEL_NAME=${MODEL:-llama3.1:8b-instruct-q4_K_M}
         volumes:
             - ./openclaw.json:/tmp/openclaw.json
             - ./workspace:/root/.openclaw/workspace
@@ -52,10 +53,10 @@ services:
             sh -c "
             mkdir -p /root/.openclaw &&
             cp /tmp/openclaw.json /root/.openclaw/openclaw.json && 
-            sed -i \"s/REPLACE_GATEWAY_TOKEN/$$GATEWAY_TOKEN/g\" /root/.openclaw/openclaw.json &&
-            sed -i \"s|REPLACE_TELEGRAM_TOKEN|$$TELEGRAM_TOKEN|g\" /root/.openclaw/openclaw.json &&
-            sed -i \"s/REPLACE_GOOGLE_KEY/$$GOOGLE_KEY/g\" /root/.openclaw/openclaw.json &&
-            sed -i \"s/REPLACE_MODEL/$$MODEL_NAME/g\" /root/.openclaw/openclaw.json &&
+            sed -i \"s|\\\${GATEWAY_TOKEN}|$$GATEWAY_TOKEN|g\" /root/.openclaw/openclaw.json &&
+            sed -i \"s|\\\${TELEGRAM_TOKEN}|$$TELEGRAM_TOKEN|g\" /root/.openclaw/openclaw.json &&
+            sed -i \"s|\\\${GOOGLE_API_KEY}|$$GOOGLE_API_KEY|g\" /root/.openclaw/openclaw.json &&
+            sed -i \"s|\\\${MODEL_NAME}|$$MODEL_NAME|g\" /root/.openclaw/openclaw.json &&
             openclaw gateway --allow-unconfigured
             "
         depends_on:
