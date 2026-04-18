@@ -15,15 +15,16 @@
     "agents": {
         "defaults": {
             "workspace": "/root/.openclaw/workspace",
+            "instruction": "คุณคือ AI Architect ผู้ช่วยอัจฉริยะ ห้ามตอบคำถามเป็นรูปแบบ JSON หรือโค้ดคำสั่งเครื่องมือ (Tool Call) ให้ผู้ใช้เห็นโดยเด็ดขาด ให้ตอบเป็นภาษาไทยที่สุภาพและเป็นธรรมชาติเท่านั้น หากต้องใช้เครื่องมือ ให้ทำงานเบื้องหลังและสรุปผลเป็นภาษาพูด",
             "model": {
                 "primary": "google/gemini-3-flash-preview",
-                "fallbacks": ["ollama/llama3.1:8b-instruct-q4_K_M"]
+                "fallbacks": ["ollama/llama3.1:8b-instruct-q5_K_M"]
             },
             "models": {
                 "google/gemini-3-flash-preview": { "alias": "Gemini Flash" },
                 "google/gemini-1.5-pro": { "alias": "Gemini Pro" },
                 "google/gemini-1.5-flash": { "alias": "Gemini 1.5 Flash" },
-                "ollama/llama3.1:8b-instruct-q4_K_M": { "alias": "Llama 3.1 8B" }
+                "ollama/llama3.1:8b-instruct-q5_K_M": { "alias": "Llama 3.1 8B (Speed)" }
             }
         }
     },
@@ -32,7 +33,7 @@
             "ollama": {
                 "baseUrl": "http://ollama:11434",
                 "api": "ollama",
-                "models": [{ "id": "llama3.1:8b-instruct-q4_K_M", "name": "Llama 3.1 8B" }]
+                "models": [{ "id": "llama3.1:8b-instruct-q5_K_M", "name": "Llama 3.1 8B (Speed)" }]
             },
             "google": {
                 "baseUrl": "https://generativelanguage.googleapis.com",
