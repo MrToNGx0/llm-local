@@ -15,7 +15,6 @@
     "agents": {
         "defaults": {
             "workspace": "/root/.openclaw/workspace",
-            "instruction": "คุณคือ AI Architect ให้ตอบกระชับ เข้าประเด็นทันที ห้ามเกริ่นนำ และห้ามตอบเป็น JSON ทุกครั้งที่ตอบเสร็จ ให้ปิดท้ายด้วยข้อมูลดังนี้ในบรรทัดใหม่:\n[Model: ชื่อโมเดล]\n[Usage: Input: XXX | Output: YYY tokens]\n*หมายเหตุ: หากเป็นรุ่นฟรีให้ระบุ (Free) ไว้หลังชื่อโมเดล",
             "model": {
                 "primary": "google/gemini-3-flash-preview",
                 "fallbacks": ["ollama/llama3.1:8b-instruct-q5_K_M"]
